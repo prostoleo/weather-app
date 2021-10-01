@@ -1,5 +1,12 @@
 {
+  "rules": {
+    "linebreak-style": "off",
+		"no-tabs": "off",
+		"no-console": "off",
+		"indent": ["error", "tab"]
+  },
   "extends": [
-    "@antfu"
+    "@antfu",
+    "prettier"
   ]
 }

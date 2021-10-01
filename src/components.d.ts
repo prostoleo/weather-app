@@ -9,11 +9,9 @@ declare module 'vue' {
     CarbonLanguage: typeof import('~icons/carbon/language')['default']
     CarbonLogoGithub: typeof import('~icons/carbon/logo-github')['default']
     CarbonMoon: typeof import('~icons/carbon/moon')['default']
-    CarbonPedestrian: typeof import('~icons/carbon/pedestrian')['default']
     CarbonSun: typeof import('~icons/carbon/sun')['default']
-    CarbonWarning: typeof import('~icons/carbon/warning')['default']
-    Footer: typeof import('./components/Footer.vue')['default']
-    README: typeof import('./components/README.md')['default']
+    Footer: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/Footer.vue')['default']
+    README: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/README.md')['default']
   }
 }
 
