@@ -3,10 +3,12 @@
     "linebreak-style": "off",
 		"no-tabs": "off",
 		"no-console": "off",
-		"indent": ["error", "tab"]
+		"indent": ["warn", "space"],
+    "yml/no-tab-indent": "off"
   },
   "extends": [
-    "@antfu",
+    // "@antfu",
+    "plugin:vue/vue3-recommended",
     "prettier"
   ]
 }

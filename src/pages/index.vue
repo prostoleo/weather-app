@@ -1,62 +1,59 @@
+<template>
+  <section>
+    <BaseContainer>
+      <div class="content">
+        <h3 class="date">пт, 1 окт.</h3>
+        <h3 class="time">13:57</h3>
+        <h2 class="lоcation">Москва, Российская Федерация</h2>
+        <h2 class="temperature">+5</h2>
+
+        <h3 class="description">облачно с прояснениями</h3>
+
+        <img src="/icons/clouds.svg" alt="облачно с прояснениями">
+
+        <pre>
+          {{data}}
+        </pre>
+
+
+      </div>
+    </BaseContainer>
+  </section>
+</template>
+
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
+  import { WEATHER_URL, API_KEY, TIME } from '~/config/config.js';
 
-const user = useUserStore()
-const name = ref(user.savedName)
+  console.log('WEATHER_URL: ', WEATHER_URL);
+  console.log('API_KEY: ', API_KEY);
+  console.log('TIME: ', TIME);
 
-const router = useRouter()
-const go = () => {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
-}
+  const data = ref([]);
 
-const { t } = useI18n()
+  watch(getWeatherData, (newVal) => {
+    console.log('newVal: ', newVal);
+    // data.value = newVal;
+  });
+
+  async function getWeatherData() {
+    try {
+      const response = await fetch(`${WEATHER_URL}?q=Москва,ru&units=metric&appid=${API_KEY}&lang=ru`);
+
+      const result = await response.json();
+
+      data.value = result;
+      // return result;
+    } catch (error) {
+      console.log(`💣💣💣 ${error}`);
+    }
+  };
+
+  // const data = await getWeatherData();
 </script>
 
-<template>
-  <div>
-    <p class="text-4xl">
-      <carbon-campsite class="inline-block" />
-    </p>
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">
-        Vitesse
-      </a>
-    </p>
-    <p>
-      <em class="text-sm opacity-75">{{ t('intro.desc') }}</em>
-    </p>
-
-    <div class="py-4" />
-
-    <input
-      id="input"
-      v-model="name"
-      :placeholder="t('intro.whats-your-name')"
-      :aria-label="t('intro.whats-your-name')"
-      type="text"
-      autocomplete="false"
-      p="x-4 y-2"
-      w="250px"
-      text="center"
-      bg="transparent"
-      border="~ rounded gray-200 dark:gray-700"
-      outline="none active:none"
-      @keydown.enter="go"
-    >
-    <label class="hidden" for="input">{{ t('intro.whats-your-name') }}</label>
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        {{ t('button.go') }}
-      </button>
-    </div>
-  </div>
-</template>
+<style lang="scss" scoped>
+  
+</style>
 
 <route lang="yaml">
 meta:

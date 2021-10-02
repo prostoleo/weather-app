@@ -38,6 +38,21 @@ export default defineConfig({
           },
         },
       },
+      screens: {
+        'sm': '600px',
+        'md': '900px',
+        'lg': '1200px',
+        'xl': '14000px',
+        '2xl': '1900px',
+      },
+
+      colors: {
+        primary: 'hsl(193, 86%, 84%)',
+        secondary1: 'hsl(172, 65%, 83%)',
+        secondary2: 'hsl(173, 78%, 89%)',
+        accent: 'hsl(173, 53%, 46%)',
+
+      }
     },
   },
 })
