@@ -40,7 +40,7 @@ useHead({
 		// todo 2 вариант загрузки шрифтов - асинхронно, быстрее загрузка, есть дергания
 		{
 			rel: "preload", 
-      href: "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",
+      href: "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&display=swap",
       as: "style",
       onload: "this.onload=null; this.rel='stylesheet'; document.body.classList.add('fontLoaded')"
 		}	
@@ -49,6 +49,8 @@ useHead({
 </script>
 
 <style lang="scss">
+@use 'styles/main.scss' as *;
+
 	body {
 		font-family: Helvetica, Arial, sans-serif;
 	}
@@ -57,7 +59,20 @@ useHead({
 		font-family: 'Lato', sans-serif !important;
 	}
 
-	
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  // font-size: 62.5%;
+}
+
+body {
+  // font-size: 1rem;
+	background: rgb(75, 74, 74);
+}
 </style>
 
 
