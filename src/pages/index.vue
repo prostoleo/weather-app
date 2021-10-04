@@ -1,5 +1,6 @@
 <template>
-  <section class="pb-8">
+  <section class="min-h-screen pb-7">
+    <Header />
     <BaseContainer>
       <BaseSpinner v-if="loading" />
       <div v-else-if="!loading && !getData"   class="error pt-5 text-center text-white text-lg">
@@ -60,7 +61,7 @@
 
         <div class="days-wrapper mt-14">
           <h2 class="title font-bold text-white ">
-            <router-link to="/days" class="text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:!border-opacity-100">Прогноз на 7 дней</router-link>
+            <router-link to="/forecast" class="text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:!border-opacity-100">Прогноз на 7 дней</router-link>
           </h2>
 
           <div class="cards__wrapper mt-5 flex gap-x-3 items-center overflow-x-auto">
@@ -120,7 +121,7 @@ import { WEATHER_URL, API_KEY, TIME } from '~/config/config.js';
 // todo получаем инфу по странам
 import { getCountryByCode } from '~/data/data.js';
 
-import { useWeatherNowStore } from '~/stores/weather.js'
+import { useWeatherStore } from '~/stores/weather.js'
 
 console.log('WEATHER_URL: ', WEATHER_URL);
 console.log('API_KEY: ', API_KEY);
@@ -130,15 +131,53 @@ console.log('TIME: ', TIME);
 const data = ref(null);
 //* для загрузки
 const loading = ref(false);
+let timer = null;
 
 const locale = navigator.language;
 
+// todo работа с pinia store
+const weatherNow = useWeatherStore();
+
 // todo получаем основную информацию о погоде
 async function getWeatherData() {
+  const dataFromStore = weatherNow.getWeatherNow
+  console.log('dataFromStore: ', dataFromStore);
+
+  //* если получили данные из store - записываем данные и выходим из функции
+  if (dataFromStore) {
+    data.value = dataFromStore; 
+
+    return;
+  }
+
   try {
+    timer = setTimeout(() => {
+      throw new Error ('Упс, запрос занял слишком много времени');
+    }, TIME * 1000)
+
     loading.value = true;
 
-    const response = await fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`);
+    /* const requests = [
+      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
+      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
+      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
+    ];
+
+    const responses = await Promise.all(requests);
+    console.log('responses: ', responses);
+
+    responses.forEach((response) => {
+			if (!response.ok) {
+				throw new Error(
+					`Oops, something went wrong. Try again later (${response.status})`
+				);
+			}
+		}); */
+
+    const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`
+    ;
+
+    const response = await fetch(request);
     console.log('response: ', response);
 
     if (!response.ok) {
@@ -156,6 +195,8 @@ async function getWeatherData() {
     console.log(`💣💣💣 ${error}`);
   } finally {
     loading.value = false;
+   
+    clearTimeout(timer);
   }
 };
 
@@ -168,7 +209,6 @@ watch(getWeatherData, (newVal) => {
 const getData = computed(() => data.value);
 
 // todo работа с pinia store
-const weatherNow = useWeatherNowStore();
 weatherNow.addWeatherNow(getData.value);
 
 //=====================================
@@ -236,6 +276,19 @@ const getLocalDate = (timezone) => {
 
   return realDate;
 }
+
+// todo функция для направления ветра
+/* function toTextualDescription(degree) {
+  if (degree > 337.5) return 'Northerly';
+  if (degree > 292.5) return 'North Westerly';
+  if (degree > 247.5) return 'Westerly';
+  if (degree > 202.5) return 'South Westerly';
+  if (degree > 157.5) return 'Southerly';
+  if (degree > 122.5) return 'South Easterly';
+  if (degree > 67.5) return 'Easterly';
+  if (degree > 22.5) return 'North Easterly'ж
+  return 'Northerly';
+} */
 
 // const data = await getWeatherData();
 </script>

@@ -72,6 +72,8 @@ html {
 body {
   // font-size: 1rem;
 	background: rgb(75, 74, 74);
+
+	overflow-x: hidden !important;
 }
 </style>
 

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export const useWeatherNowStore = defineStore('weather-now', {
+export const useWeatherStore = defineStore('weather', {
   state: () => {
     weather: null
     query: ''
