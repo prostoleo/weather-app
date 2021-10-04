@@ -19,3 +19,15 @@ declare module '~/config/config.js' {
   export const TIME = TIME;
 }
 
+declare module '~/data/data.js' {
+  import { getCountryByCode } from '~/data/data.js';
+
+  export const getCountryByCode = getCountryByCode;
+}
+
+declare module '~/stores/weather.js' {
+  import { getCountryByCode } from '~/stores/weather.js';
+
+  export const getCountryByCode = getCountryByCode;
+}
+

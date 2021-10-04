@@ -5,6 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     BaseContainer: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/base/BaseContainer.vue')['default']
+    BaseSpinner: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/base/BaseSpinner.vue')['default']
     CarbonCampsite: typeof import('~icons/carbon/campsite')['default']
     CarbonDicomOverlay: typeof import('~icons/carbon/dicom-overlay')['default']
     CarbonLanguage: typeof import('~icons/carbon/language')['default']
