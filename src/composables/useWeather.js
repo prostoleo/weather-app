@@ -85,7 +85,7 @@ export function useWeather() {
       const resultOneCall = await responseOneCall.json();
       console.log('resultOneCall: ', resultOneCall);
 
-      dataOneCall.value = result;
+      dataOneCall.value = resultOneCall;
 
       // return result;
     } catch (error) {
@@ -112,6 +112,7 @@ export function useWeather() {
 
   return {
     data: readonly(data),
+    dataOneCall: readonly(dataOneCall),
     loading: readonly(loading),
     getWeatherData,
     getDataComputed,

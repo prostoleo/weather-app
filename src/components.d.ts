@@ -17,6 +17,7 @@ declare module 'vue' {
     Footer: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/Footer.vue')['default']
     ForecastCard: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/ForecastCard.vue')['default']
     Header: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/Header.vue')['default']
+    IndexForecastCard: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/IndexForecastCard.vue')['default']
     README: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/README.md')['default']
   }
 }

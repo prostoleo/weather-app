@@ -5,8 +5,10 @@ import { WEATHER_URL, API_KEY, TIME } from '~/config/config.js';
 import { useWeatherStore } from '~/stores/weather.js';
 
 
-export function useDate(getDataComputed) {
+export function useDate(getDataComputed, timezone = null) {
   const locale = navigator.language;
+
+  // const timezone = tz ?? getDataComputed.value?.timezone; 
 
   //* computed для получения текущей даты в коротком формате
   const compShortDateTime = computed(() => {
@@ -14,6 +16,7 @@ export function useDate(getDataComputed) {
 
       //* получаем реальную дату по локальному timestamp
       const realDate = getLocalDate(getDataComputed.value?.timezone);
+      // const realDate = getLocalDate(timezone);
 
       const date = Intl.DateTimeFormat(locale, {
         weekday: 'short',

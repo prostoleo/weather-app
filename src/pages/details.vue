@@ -69,7 +69,7 @@
                 Давление
               </span>
               <span class="value font-semibold text-black block w-6/12">
-                {{ getDataComputed.main.pressure }} гПа
+                {{ Math.round(getDataComputed.main.pressure * HPA_TO_MM_OF_MERCURY) }} мм. рт. ст.
               </span>
             </div>
             <div class="main-card__row flex items-center justify-start gap-x-5 text-left">
@@ -128,7 +128,9 @@
               <div class="card p-2 rounded-2xl bg-secondary1">
                 <!-- <p class="text-sm text-left">Восход - {{ getLocalDate(getDataComputed.sys.sunrise) }}</p> -->
                 <p class="text-sm text-left">Восход - {{ getLocalSunriseSunset(getDataComputed.sys.sunrise, getDataComputed.timezone) }}</p>
+
                 <p class="text-sm text-left mt-1">Закат - {{ getLocalSunriseSunset(getDataComputed.sys.sunset, getDataComputed.timezone) }}</p>
+
                 <p class="text-sm text-left mt-1">Продолжительность дня - {{ durationOfDay }}</p>
               </div>
             </div>
@@ -143,13 +145,17 @@
           </h2>
 
           <div class="down-part__wrapper">
-            <DuringDay />
+            <DuringDay v-for="hour in getDataOneCallComputed?.hourly.slice(1, 25)" :key="hour" :data="hour" :timezone="getDataOneCallComputed?.timezone_offset" />
 
-            
+            <pre>
+              <!-- {{ getDataOneCallComputed }} -->
+            </pre>
+            <!-- <pre>
+              {{ getDataOneCallComputed?.hourly.slice(0, 25)}}
+            </pre> -->
           </div>
         </div>
 
-      
       </div>
       
     </BaseContainer>
@@ -157,6 +163,8 @@
 </template>
 
 <script setup lang="ts">
+import { HPA_TO_MM_OF_MERCURY } from '~/config/config.js';
+
 import DuringDay from '~/components/DuringDay.vue';
 
 // todo получаем инфу по странам

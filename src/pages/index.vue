@@ -63,53 +63,27 @@
         </div>
 
         <div class="days-wrapper mt-14">
-          <h2 class="title font-bold w-max text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:!border-opacity-100">
+          <h2 class="title font-bold w-max text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:(!border-opacity-100)">
             <router-link to="/forecast" class="text-white ">Прогноз на 7 дней</router-link>
           </h2>
 
           <div class="cards__wrapper mt-5 flex gap-x-3 items-center overflow-x-auto">
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
-            <div class="card px-6 py-3 bg-white rounded-3xl flex flex-col items-center gap-y-1">
-              <span class="day uppercase text-sm">сб</span>
-              <img src="/icons/clouds.svg" alt="" class="w-5 h-5">
-              <span class="temperature font-bold">+7</span>
-            </div>
+            <IndexForecastCard v-for="forecast in getDataOneCallComputed?.daily.slice(1)" :key="forecast" :data="forecast" />
+            <!-- v-for="(forecast, index) in getDataOneCallComputed?.daily" :key="index" :data="forecast" -->
+
+            <!-- :data="getDataOneCallComputed?.daily[0]" -->
             
           </div>
         </div>
 
-        <pre class="text-gray-50 ">
+        <pre class="text-white"> {{ getDataOneCallComputed?.daily[0] }} </pre>
+
+        <!-- <pre class="text-gray-50 ">
           {{ data }}
-        </pre>
+        </pre> -->
+        <!-- <pre class="text-gray-50 ">
+          {{ getDataOneCallComputed }}
+        </pre> -->
       
       </div>
       
@@ -129,14 +103,20 @@ import { WEATHER_URL, API_KEY, TIME } from '~/config/config.js';
 import { getCountryByCode } from '~/data/data.js';
 
 // import { useWeatherStore } from '~/stores/weather.js'
+const forecasts = ref(null);
 
 console.log('WEATHER_URL: ', WEATHER_URL);
 console.log('API_KEY: ', API_KEY);
 console.log('TIME: ', TIME);
 
 // todo используем composable с получением данных
-const { data, loading, getDataComputed, getDataOneCallComputed } = useWeather();
-console.log('getDataOneCallComputed: ', getDataOneCallComputed);
+const { data, dataOneCall, loading, getDataComputed, getDataOneCallComputed } = useWeather();
+console.log('dataOneCall: ', dataOneCall);
+console.log('data: ', data);
+console.log('getDataOneCallComputed.daily: ', getDataOneCallComputed.daily);
+
+forecasts.value = getDataOneCallComputed?.daily;
+// forecasts.value.push(getDataOneCallComputed?.value.daily);
 
 //=====================================
 // todo используем composable для получения даты
