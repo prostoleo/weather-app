@@ -1,6 +1,6 @@
 <template>
   <header class="py-3" >
-    <div class="w-11/12 flex justify-between items-center mx-auto">
+    <div class="container w-11/12 flex justify-between items-center mx-auto">
       <div class="logo w-3/12">
         <router-link to="/" class="d-inline-block">
           <img :src="`/icons/logo${props.notHome === true ? '-dark': ''}.svg`" alt="логотип" class="w-20">

@@ -3,7 +3,7 @@
     <Header />
     <BaseContainer>
       <BaseSpinner v-if="loading" />
-      <div v-else-if="!loading && !getData"   class="error pt-5 text-center text-white text-lg">
+      <div v-else-if="!loading && !getDataComputed"   class="error pt-5 text-center text-white text-lg">
         Упс, что-то пошло не так 😞. Повторите запрос позже.
       </div>
       <div v-else class="content">
@@ -15,42 +15,45 @@
             {{ compShortDateTime?.time }}
           </h3>
           <h2 class="lоcation mt-3 ">
-            {{ getData.name }}, {{ getCountryName }}
+            {{ getDataComputed.name }}, {{ getCountryName }}
           </h2>
           <h2 class="temperature mt-4 text-4xl  font-bold">
-            {{ Math.round(getData.main.temp) }}
+            {{ Math.round(getDataComputed.main.temp) }}
           </h2>
 
           <h3 class="description mt-2">
-            {{ getData.weather[0].description }}
+            {{ getDataComputed.weather[0].description }}
           </h3>
 
-          <img :src="`http://openweathermap.org/img/w/${getData.weather[0].icon}.png`" alt="облачно с прояснениями" class="description-img mx-auto mt-3 w-10">
+          <img :src="`http://openweathermap.org/img/w/${getDataComputed.weather[0].icon}.png`" alt="облачно с прояснениями" class="description-img mx-auto mt-3 w-10">
 
           <div class="main-card mt-5 p-6 pb-7 w-max mx-auto bg-white rounded-3xl text-black flex justify-center gap-x-3 relative">
 
             <div class="col flex flex-col items-center justify-between">
               <img src="/icons/min.svg" alt="" class="icon w-5 h-5">
-              <span class="value block font-bold">{{  Math.round(getData.main.temp_min) }}</span>
+              <span class="value block font-bold">{{  Math.round(getDataComputed.main.temp_min) }}</span>
               <span class="naming block">мин</span>  
             </div>
 
             <div class="col flex flex-col items-center justify-between gap-y-1">
               <img src="/icons/max.svg" alt="" class="icon w-5 h-5">
-              <span class="value block font-bold">{{ Math.round(getData.main.temp_max) }}</span>
+              <span class="value block font-bold">{{ Math.round(getDataComputed.main.temp_max) }}</span>
               <span class="naming block">макс</span>  
             </div>
 
             <div class="col flex flex-col items-center justify-between gap-y-1">
               <img src="/icons/humidity.svg" alt="" class="icon w-5 h-5">
-              <span class="value block font-bold">{{ getData.main.humidity }}%</span>
+              <span class="value block font-bold">{{ getDataComputed.main.humidity }}%</span>
               <span class="naming block">влаж</span>  
             </div>
 
             <div class="col flex flex-col items-center justify-between gap-y-1">
               <img src="/icons/clouds.svg" alt="" class="icon w-5 h-5 opacity-50">
-              <span class="value block font-bold">{{ getData.wind.speed.toFixed(1) }} м/с</span>
-              <span class="naming block">{{ getData.wind.deg }}</span>  
+              <span class="value block font-bold">{{ getDataComputed.wind.speed.toFixed(1) }} м/с
+              </span>
+              <span class="naming block">
+                {{ windDirection }}
+              </span>  
             </div>
 
             <router-link to="/details" class="bg-green-500 bg-accent rounded-2xl py-2 px-3 leading-none text-dark-900 text-sm inline-flex items-center justify-center align-baseline absolute top-full left-2/4 transform -translate-x-6/12 -translate-y-6/12">
@@ -60,8 +63,8 @@
         </div>
 
         <div class="days-wrapper mt-14">
-          <h2 class="title font-bold text-white ">
-            <router-link to="/forecast" class="text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:!border-opacity-100">Прогноз на 7 дней</router-link>
+          <h2 class="title font-bold w-max text-white py-1 border-b-1 border-b-accent border-opacity-0 transition-all duration-150 hover:!border-opacity-100">
+            <router-link to="/forecast" class="text-white ">Прогноз на 7 дней</router-link>
           </h2>
 
           <div class="cards__wrapper mt-5 flex gap-x-3 items-center overflow-x-auto">
@@ -104,9 +107,9 @@
           </div>
         </div>
 
-        <!-- <pre class="text-gray-50 ">
+        <pre class="text-gray-50 ">
           {{ data }}
-        </pre> -->
+        </pre>
       
       </div>
       
@@ -116,179 +119,38 @@
 
 <script setup lang="ts">
 // todo  получаем инфу из конфига
+import { useWeather } from '~/composables/useWeather.js';
+import { useDate } from '~/composables/useDate.js';
+import { useWind } from '~/composables/useWind.js';
+
 import { WEATHER_URL, API_KEY, TIME } from '~/config/config.js';
 
 // todo получаем инфу по странам
 import { getCountryByCode } from '~/data/data.js';
 
-import { useWeatherStore } from '~/stores/weather.js'
+// import { useWeatherStore } from '~/stores/weather.js'
 
 console.log('WEATHER_URL: ', WEATHER_URL);
 console.log('API_KEY: ', API_KEY);
 console.log('TIME: ', TIME);
 
-//* для основных данных
-const data = ref(null);
-//* для загрузки
-const loading = ref(false);
-let timer = null;
-
-const locale = navigator.language;
-
-// todo работа с pinia store
-const weatherNow = useWeatherStore();
-
-// todo получаем основную информацию о погоде
-async function getWeatherData() {
-  const dataFromStore = weatherNow.getWeatherNow
-  console.log('dataFromStore: ', dataFromStore);
-
-  //* если получили данные из store - записываем данные и выходим из функции
-  if (dataFromStore) {
-    data.value = dataFromStore; 
-
-    return;
-  }
-
-  try {
-    timer = setTimeout(() => {
-      throw new Error ('Упс, запрос занял слишком много времени');
-    }, TIME * 1000)
-
-    loading.value = true;
-
-    /* const requests = [
-      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-      fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-    ];
-
-    const responses = await Promise.all(requests);
-    console.log('responses: ', responses);
-
-    responses.forEach((response) => {
-			if (!response.ok) {
-				throw new Error(
-					`Oops, something went wrong. Try again later (${response.status})`
-				);
-			}
-		}); */
-
-    const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`
-    ;
-
-    const response = await fetch(request);
-    console.log('response: ', response);
-
-    if (!response.ok) {
-      throw new Error('Упс, что-то пошло не так ');
-    }
-
-    const result = await response.json();
-    console.log('result: ', result);
-
-    data.value = result;
-
-    
-    // return result;
-  } catch (error) {
-    console.log(`💣💣💣 ${error}`);
-  } finally {
-    loading.value = false;
-   
-    clearTimeout(timer);
-  }
-};
-
-//* наблюдаем за функцией для получения основных данных
-watch(getWeatherData, (newVal) => {
-  console.log('newVal: ', newVal);
-  // data.value = await newVal;
-});
-
-const getData = computed(() => data.value);
-
-// todo работа с pinia store
-weatherNow.addWeatherNow(getData.value);
+// todo используем composable с получением данных
+const { data, loading, getDataComputed, getDataOneCallComputed } = useWeather();
+console.log('getDataOneCallComputed: ', getDataOneCallComputed);
 
 //=====================================
+// todo используем composable для получения даты
+const { compShortDateTime, getLocalDate } = useDate(getDataComputed);
+console.log('getLocalDate: ', getLocalDate);
 
-//* computed для получения текущей даты в коротком формате
-const compShortDateTime = computed(() => {
-  console.log('getData.value: ', getData.value);
-  if (getData.value) {
-    console.log('getData.value?.dt: ', getData.value?.dt);
-    console.log('getData.value?.dt: ', typeof getData.value?.dt);
-    console.log('getData.value?.timezone: ', getData.value?.timezone);
-    console.log('getData.value?.timezone: ', typeof getData.value?.timezone);
-
-    //* получаем реальную дату по локальному timestamp
-    const realDate = getLocalDate(getData.value?.timezone);
-
-    const date = Intl.DateTimeFormat(locale, {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short'
-    }).format(realDate);
-
-    const time = Intl.DateTimeFormat(locale, {
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(realDate);
-
-    return {
-      date,
-      time 
-    }
-    // return getData.value.dt;
-  }
-});
+// todo используем composable для получения даты
+const { windDirection, windTextualDescription } = useWind(getDataComputed);
+console.log('windTextualDescription: ', windTextualDescription);
 
 // todo получаем имя страны
 const getCountryName = computed(() => {
-  return getCountryByCode(getData.value?.sys.country)
+  return getCountryByCode(getDataComputed.value?.sys.country)
 })
-
-// todo функция для получения локальной дату по месту
-const getLocalDate = (timezone) => {
-  const d = new Date();
-  console.log('d: ', d);
-
-  //* получаем текущее время где находится пользователь
-  const localTime = d.getTime();
-  console.log('localTime: ', localTime);
-
-  //* получаем временную зону в минутах и переводим ее в миллисекунды
-  const localOffset = d.getTimezoneOffset() * 60 * 1000;
-  console.log('d.getTimezoneOffset(): ', d.getTimezoneOffset());
-  console.log('localOffset: ', localOffset);
-
-  //* получаем время по гринвичу
-  const utc = localTime + localOffset;
-  console.log('utc: ', utc);
-
-  //* получаем локальный timestamp со смещением 
-  const localDate = utc + (1000 * timezone);
-
-  //* получаем локальное время в формате даты
-  const realDate = new Date(localDate);
-  console.log('realDate: ', realDate);
-
-  return realDate;
-}
-
-// todo функция для направления ветра
-/* function toTextualDescription(degree) {
-  if (degree > 337.5) return 'Northerly';
-  if (degree > 292.5) return 'North Westerly';
-  if (degree > 247.5) return 'Westerly';
-  if (degree > 202.5) return 'South Westerly';
-  if (degree > 157.5) return 'Southerly';
-  if (degree > 122.5) return 'South Easterly';
-  if (degree > 67.5) return 'Easterly';
-  if (degree > 22.5) return 'North Easterly'ж
-  return 'Northerly';
-} */
 
 // const data = await getWeatherData();
 </script>

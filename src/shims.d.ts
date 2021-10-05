@@ -30,4 +30,19 @@ declare module '~/stores/weather.js' {
 
   export const getCountryByCode = getCountryByCode;
 }
+declare module '~/composables/useWeather.js' {
+  import { useWeather } from '~/composables/useWeather.js';
+
+  export const useWeather = useWeather;
+}
+declare module '~/composables/useDate.js' {
+  import { useDate } from '~/composables/useDate.js';
+
+  export const useDate = useDate;
+}
+declare module '~/composables/useWind.js' {
+  import { useWind } from '~/composables/useWind.js';
+
+  export const useWind = useWind;
+}
 
