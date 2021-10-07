@@ -25,7 +25,7 @@
             {{ getDataComputed.weather[0].description }}
           </h3>
 
-          <img :src="`http://openweathermap.org/img/w/${getDataComputed.weather[0].icon}.png`" alt="облачно с прояснениями" class="description-img mx-auto mt-3 w-10">
+          <img :src="`http://openweathermap.org/img/w/${getDataComputed.weather[0].icon}.png`" alt="облачно с прояснениями" class="description-img rounded-lg mx-auto mt-3 w-12">
 
           <div class="main-card mt-5 p-6 pb-7 w-max mx-auto bg-white rounded-3xl text-black flex justify-center gap-x-3 relative">
 
@@ -76,7 +76,7 @@
           </div>
         </div>
 
-        <pre class="text-white"> {{ getDataOneCallComputed?.daily[0] }} </pre>
+        <!-- <pre class="text-white"> {{ getDataOneCallComputed?.daily[0] }} </pre> -->
 
         <!-- <pre class="text-gray-50 ">
           {{ data }}

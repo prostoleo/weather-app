@@ -25,6 +25,11 @@ declare module '~/data/data.js' {
 
   export const getCountryByCode = getCountryByCode;
 }
+declare module '~/helpers/helpers.js' {
+  import { getLocalSunriseSunset } from '~/helpers/helpers.js';
+
+  export const getLocalSunriseSunset = getLocalSunriseSunset;
+}
 
 declare module '~/stores/weather.js' {
   import { getCountryByCode } from '~/stores/weather.js';

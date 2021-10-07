@@ -14,6 +14,7 @@ declare module 'vue' {
     CarbonSun: typeof import('~icons/carbon/sun')['default']
     CarbonWarning: typeof import('~icons/carbon/warning')['default']
     DuringDay: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/DuringDay.vue')['default']
+    DuringDayCard: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/DuringDayCard.vue')['default']
     Footer: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/Footer.vue')['default']
     ForecastCard: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/ForecastCard.vue')['default']
     Header: typeof import('I:/PROJECTS SITES/projects/weather-app-vitesse/src/components/Header.vue')['default']

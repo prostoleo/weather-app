@@ -1,6 +1,7 @@
 <template>
   <header class="py-3" >
-    <div class="container w-11/12 flex justify-between items-center mx-auto">
+    <BaseContainer class="flex justify-between items-center mx-auto">
+    <!-- <div class="container w-11/12 flex justify-between items-center mx-auto max-w-900px"> -->
       <div class="logo w-3/12">
         <router-link to="/" class="d-inline-block">
           <img :src="`/icons/logo${props.notHome === true ? '-dark': ''}.svg`" alt="логотип" class="w-20">
@@ -12,7 +13,8 @@
           <img :src="`/icons/search${props.notHome === true ? '-dark': ''}.svg`" alt="">
         </button>
       </form>
-    </div> 
+    <!-- </div>  -->
+    </BaseContainer>
   </header>
   <!-- <header class="header">
     <BaseContainer>
