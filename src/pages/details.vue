@@ -6,7 +6,7 @@
       <div v-else-if="error.status" class="error text-center text-black text-lg">
         Упс, что-то пошло не так 😞. Повторите запрос позже.
       </div>
-      <div v-else class="content text-center pt-5">
+      <div v-else-if="getDataOneCallComputed" class="content text-center pt-5">
         <div class="upper-content text-center text-black">
           <h3 class="date text-sm opacity-80 uppercase">
             {{ compShortDateTime?.date }}
@@ -58,10 +58,10 @@
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
               <span class="key text-sm font-thin text-black80 block w-8/12">
-                Влажность
+                Влажность, %
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ Math.round(getDataOneCallComputed?.daily[0].humidity) }} %
+                {{ Math.round(getDataOneCallComputed?.daily[0].humidity) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -69,7 +69,7 @@
                 Давление, мм.рт.ст.
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ Math.round(getDataOneCallComputed?.daily[0].humidity * HPA_TO_MM_OF_MERCURY) }}
+                {{ Math.round(getDataOneCallComputed?.daily[0].pressure * HPA_TO_MM_OF_MERCURY) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">

@@ -4,7 +4,7 @@ import { WEATHER_URL, API_KEY, TIME, API_KEY_CODING, API_KEY_REVERSE_CODING, COD
 
 import { useWeatherStore } from '~/stores/weather.js';
 
-export function useWeather() {
+export function useWeather(query = null) {
   //* для основных данных
   const data = ref(null);
 
@@ -40,6 +40,8 @@ export function useWeather() {
 
   // todo получаем основную информацию о погоде
   async function getWeatherData(coords = null) {
+    loading.value = true;
+
     const dataFromStore = store.getWeatherNow;
     console.log('dataFromStore: ', dataFromStore);
 
@@ -52,8 +54,10 @@ export function useWeather() {
 
     try {
       loading.value = true;
+     
       const geoData = window.navigator.geolocation.getCurrentPosition(
         async (dataGeo) => {
+          loading.value = true;
           console.log('dataGeo: ', dataGeo);
           coords.lat = dataGeo.coords.latitude;
           coords.lon = dataGeo.coords.longitude;
@@ -63,7 +67,7 @@ export function useWeather() {
           gotGeoData.value = true;
           store.addCoords(coords);
     
-          loading.value = true;
+          
           await getReverseGeocoding(coords);
           await getOneCallData(coords);
           loading.value = false;
@@ -84,112 +88,6 @@ export function useWeather() {
       }, TIME * 1000);
 
       
-
-      /* const requests = [
-        fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-        fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-        fetch(`${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`),
-      ];
-
-      const responses = await Promise.all(requests);
-      console.log('responses: ', responses);
-
-      responses.forEach((response) => {
-        if (!response.ok) {
-          throw new Error(
-            `Oops, something went wrong. Try again later (${response.status})`
-          );
-        }
-      }); */
-
-      async function getGeocoding(query = null) {
-        console.log('locationData: ', locationData);
-        if (!query && !locationData.display_name) {
-          throw new Error('не удалось получить данные');
-        }
-        // const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`;
-        const request = `${CODING_URL}?key=${API_KEY_CODING}&q=${locationData.display_name.split(',')[0]}&format=json`
-
-        const response = await fetch(request, {
-          headers: {
-            'Accept-Language': 'ru'
-          }
-        });
-        console.log('response: ', response);
-
-        if (!response.ok) {
-          throw new Error('Упс, что-то пошло не так ');
-        }
-
-        const result = await response.json();
-        console.log('result: ', result);
-
-        // data.value = result;
-        //* сохраняем необходимые данные
-
-        coords.lat = result[0].lat;
-        coords.lon = result[0].lon;
-        locationData.display_name = result[0].display_name;
-        locationData.icon = result[0].icon;
-
-      }
-
-      async function getReverseGeocoding(coords) {
-        console.log('coords - reverseGeoCoding: ', coords);
-
-        if (!coords) {
-          throw new Error(' не удалось получить координаты  ');
-        }
-        // const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`;
-        const request = `${CODING_REVERSE_URL}?key=${API_KEY_REVERSE_CODING}&lat=${coords.lat}&lon=${coords.lon}&format=json`
-
-        const response = await fetch(request, {
-          headers: {
-            'Accept-Language': 'ru'
-          }
-        });
-        console.log('response: ', response);
-
-        if (!response.ok) {
-          throw new Error('Упс, что-то пошло не так ');
-        }
-
-        const result = await response.json();
-        console.log('result: ', result);
-
-        // data.value = result;
-        //* сохраняем необходимые данные
-        locationData.display_name = result.display_name;
-        locationData.icon = result?.icon;
-      }
-
-      // todo для oneCall API
-      async function getOneCallData(cds) {
-        console.log('coords in getOneCallData(): ', coords);
-
-        const exclude = 'minutely,alerts';
-
-        const coordsToApi = cds ?? {
-          lat: coords?.lat, 
-          lon: coords?.lon, 
-        }
-
-        const requestOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${coordsToApi.lat}&lon=${coordsToApi.lon}&units=metric&&exclude=${exclude}&appid=${API_KEY}&lang=ru`;
-
-        const responseOneCall = await fetch(requestOneCall);
-        console.log('responseOneCall: ', responseOneCall);
-
-        if (!responseOneCall.ok) {
-          throw new Error('Упс, что-то пошло не так ');
-        }
-
-        const resultOneCall = await responseOneCall.json();
-        console.log('resultOneCall: ', resultOneCall);
-
-        dataOneCall.value = resultOneCall;
-
-        // return result;
-      }
     } catch (error) {
       console.error(`💣💣💣 ${error}`);
     } finally {
@@ -198,6 +96,110 @@ export function useWeather() {
       clearTimeout(timer);
     }
   };
+
+  async function getGeocoding(query) {
+    console.log('query: ', query);
+    loading.value = true;
+
+    console.log('locationData: ', locationData);
+    if (!query) {
+      throw new Error('не удалось получить данные');
+    }
+    // const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`;
+    const request = `${CODING_URL}?key=${API_KEY_CODING}&q=${query}&format=json`
+
+    const response = await fetch(request, {
+      headers: {
+        'Accept-Language': 'ru'
+      }
+    });
+    console.log('response: ', response);
+
+    if (!response.ok) {
+      throw new Error('Упс, что-то пошло не так ');
+    }
+
+    const result = await response.json();
+    console.log('result: ', result);
+
+    // data.value = result;
+    //* сохраняем необходимые данные
+
+    coords.lat = result[0].lat;
+    coords.lon = result[0].lon;
+    locationData.display_name = result[0].display_name;
+    locationData.icon = result[0].icon;
+
+    return {
+      coords,
+      locationData
+    }
+  }
+
+  async function getReverseGeocoding(coords) {
+    loading.value = true;
+
+    console.log('coords - reverseGeoCoding: ', coords);
+
+    if (!coords) {
+      throw new Error(' не удалось получить координаты  ');
+    }
+    // const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`;
+    const request = `${CODING_REVERSE_URL}?key=${API_KEY_REVERSE_CODING}&lat=${coords.lat}&lon=${coords.lon}&format=json`
+
+    const response = await fetch(request, {
+      headers: {
+        'Accept-Language': 'ru'
+      }
+    });
+    console.log('response: ', response);
+
+    if (!response.ok) {
+      throw new Error('Упс, что-то пошло не так ');
+    }
+
+    const result = await response.json();
+    console.log('result: ', result);
+
+    // data.value = result;
+    //* сохраняем необходимые данные
+    locationData.display_name = result.display_name;
+    locationData.icon = result?.icon;
+  }
+
+  // todo для oneCall API
+  async function getOneCallData(cds) {
+    console.log('coords in getOneCallData(): ', coords);
+
+    const exclude = 'minutely,alerts';
+
+    const coordsToApi = cds ?? {
+      lat: coords?.lat, 
+      lon: coords?.lon, 
+    }
+
+    console.log('coordsToApi: ', coordsToApi);
+
+    const requestOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${coordsToApi.lat}&lon=${coordsToApi.lon}&units=metric&&exclude=${exclude}&appid=${API_KEY}&lang=ru`;
+
+    const responseOneCall = await fetch(requestOneCall);
+    console.log('responseOneCall: ', responseOneCall);
+
+    if (!responseOneCall.ok) {
+      throw new Error('Упс, что-то пошло не так ');
+    }
+
+    const resultOneCall = await responseOneCall.json();
+    console.log('resultOneCall: ', resultOneCall);
+
+    dataOneCall.value = resultOneCall;
+
+    // todo работа с pinia store
+    store.addWeatherNow(dataOneCall);
+
+    // return result;
+    loading.value = false;
+  }
 
   //* наблюдаем за функцией для получения основных данных
   /* watch(getWeatherData, (newVal) => {
@@ -213,12 +215,16 @@ export function useWeather() {
     }
   );
 
+  watch(getOneCallData, () => {
+
+  });
+
   // const getDataComputed = computed(() => data.value);
 
   const getDataOneCallComputed = computed(() => dataOneCall.value);
 
   // todo работа с pinia store
-  store.addWeatherNow(getDataOneCallComputed);
+  // store.addWeatherNow(dataOneCall);
 
   return {
     // data: readonly(data),
@@ -226,6 +232,10 @@ export function useWeather() {
     loading: readonly(loading),
     gotGeoData: readonly(gotGeoData),
     locationData: readonly(locationData),
+
+    getGeocoding,
+    getOneCallData,
+
     error,
     coords,
     getWeatherData,

@@ -1,6 +1,6 @@
 <template>
   <section class="min-h-screen pb-7">
-    <Header />
+    <Header @submit-form="showWeatherOnSearch" />
     <BaseContainer>
       <BaseSpinner v-if="loading" />
       <div v-else-if="error.status"   class="error pt-5 text-center text-white text-lg">
@@ -11,7 +11,7 @@
       </div>
       
 
-      <div v-else class="content">
+      <div v-else-if="getDataOneCallComputed" class="content">
         <div class="upper-content text-center text-white pt-6">
           <h3 class="date text-sm opacity-80 uppercase">
             </h3>
@@ -88,7 +88,7 @@
           {{ data }}
         </pre> -->
         <pre class="text-gray-50 ">
-          {{ getDataOneCallComputed }}
+          <!-- {{ getDataOneCallComputed }} -->
         </pre>
       
       </div>
@@ -116,7 +116,8 @@ console.log('API_KEY: ', API_KEY);
 console.log('TIME: ', TIME); */
 
 // todo используем composable с получением данных
-const { loading, error, gotGeoData, locationData, coords, getDataOneCallComputed } = useWeather();
+const { dataOneCall, loading, error, gotGeoData, locationData, coords, getDataOneCallComputed, getGeocoding, getOneCallData } = useWeather();
+
 
 console.log('coords: ', coords);
 
@@ -137,6 +138,17 @@ console.log('compShortDateTime: ', compShortDateTime);
 const { windDirection, windTextualDescription } = useWind(getDataOneCallComputed);
 console.log('windDirection: ', windDirection);
 // console.log('windTextualDescription: ', windTextualDescription);
+
+async function showWeatherOnSearch(searchQuery: string) {
+  console.log('searchQuery: ', searchQuery);
+
+  const { coords } = await getGeocoding(searchQuery); 
+  console.log('coords: ', coords);
+
+  await getOneCallData(coords);
+  console.log('dataOneCall: ', dataOneCall);
+
+}
 
 // todo получаем имя страны
 /* const getCountryName = computed(() => {

@@ -7,8 +7,8 @@
           <img :src="`/icons/logo${props.notHome === true ? '-dark': ''}.svg`" alt="логотип" class="w-20">
         </router-link>
       </div>
-      <form class="inline-flex items-center">
-        <input type="text" class="bg-transparent border-b-1 p-1" :class="props.notHome === true ? 'text-black border-gray-900' : 'text-white border-grey-100'">
+      <form class="inline-flex items-center" @submit.prevent="submitForm">
+        <input type="text" class="bg-transparent border-b-1 p-1" :class="props.notHome === true ? 'text-black border-gray-900' : 'text-white border-grey-100'" v-model="inputValue">
         <button>
           <img :src="`/icons/search${props.notHome === true ? '-dark': ''}.svg`" alt="">
         </button>
@@ -41,7 +41,20 @@
       type: Boolean,
       default: false
     }
-  })
+  });
+
+  const inputValue = ref('');
+
+  const emits = defineEmits(['submit-form']);
+
+  function submitForm() {
+    if (!inputValue.value) {
+      return;
+    }
+
+    emits('submit-form', inputValue.value);
+    inputValue.value = '';
+  }
 </script>
 
 <style lang="scss" scoped>
