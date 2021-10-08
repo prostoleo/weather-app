@@ -1,7 +1,7 @@
-export function useWind(getDataComputed) {
+export function useWind(getData) {
   //* для направления ветра
   const windDirection = computed(() => {
-    return windTextualDescription(getDataComputed?.wind?.deg)
+    return windTextualDescription(getData?.current?.wind_deg)
   });
 
   // todo функция для направления ветра

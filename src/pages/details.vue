@@ -3,7 +3,7 @@
     <Header :not-home="true" />
     <BaseContainer>
       <BaseSpinner v-if="loading" />
-      <div v-else-if="!loading && !getDataComputed" class="error text-center text-white text-lg">
+      <div v-else-if="error.status" class="error text-center text-black text-lg">
         Упс, что-то пошло не так 😞. Повторите запрос позже.
       </div>
       <div v-else class="content text-center pt-5">
@@ -15,18 +15,18 @@
             {{ compShortDateTime?.time }}
           </h3>
           <h2 class="lоcation mt-3 ">
-            {{ getDataComputed.name }}, {{ getCountryName }}
+            {{ locationData?.display_name }}
           </h2>
           <h2 class="temperature mt-4 text-4xl  font-bold">
-            {{ Math.round(getDataComputed.main.temp) }}
+            {{ Math.round(getDataOneCallComputed?.current.temp) }}
           </h2>
 
           <h3 class="description mt-2">
-            {{ getDataComputed.weather[0].description }}
+            {{ getDataOneCallComputed?.current.weather[0].description }}
           </h3>
 
           <img 
-            :src="`http://openweathermap.org/img/w/${getDataComputed.weather[0].icon}.png`" 
+            :src="`http://openweathermap.org/img/w/${getDataOneCallComputed?.current.weather[0].icon}.png`" 
             alt="облачно с прояснениями" class="description-img mx-auto mt-3 w-10"
           >
 
@@ -37,7 +37,7 @@
                 Ощущается как, &#8451;
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{  Math.round(getDataComputed.main.feels_like) }}
+                {{ Math.round(getDataOneCallComputed?.current.feels_like) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-5 text-left">
@@ -45,7 +45,7 @@
                 Мин., &#8451;
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ Math.round(getDataComputed.main.temp_min) }}
+                {{ Math.round(getDataOneCallComputed?.daily[0].temp.min) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -53,7 +53,7 @@
                 Макс., &#8451;
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ Math.round(getDataComputed.main.temp_max) }}
+                {{ Math.round(getDataOneCallComputed?.daily[0].temp.max) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -61,7 +61,7 @@
                 Влажность
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ getDataComputed.main.humidity }} %
+                {{ Math.round(getDataOneCallComputed?.daily[0].humidity) }} %
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -69,7 +69,7 @@
                 Давление, мм.рт.ст.
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ Math.round(getDataComputed.main.pressure * HPA_TO_MM_OF_MERCURY) }}
+                {{ Math.round(getDataOneCallComputed?.daily[0].humidity * HPA_TO_MM_OF_MERCURY) }}
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -77,7 +77,7 @@
                 Видимость, м.
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ getDataComputed.visibility }} 
+                {{ getDataOneCallComputed?.current.visibility }} 
               </span>
             </div>
             <div class="main-card__row flex items-center justify-between gap-x-3 text-left">
@@ -85,7 +85,7 @@
                 Облачность, %
               </span>
               <span class="value font-semibold text-black block w-3/12">
-                {{ getDataComputed.clouds.all }}
+                {{ getDataOneCallComputed?.current.clouds }}
               </span>
             </div>
             <!-- <div class="main-card__row flex items-center justify-between gap-x-5 text-left">
@@ -93,7 +93,7 @@
                 Восход
               </span>
               <span class="value font-semibold text-black block w-6/12">
-                {{ getDataComputed.sys.sunrise }}
+                {{ getDataOneCallComputed.sys.sunrise }}
               </span>
             </div> -->
             <!-- <div class="main-card__row flex items-center justify-start gap-x-5 text-left">
@@ -101,7 +101,7 @@
                 Закат
               </span>
               <span class="value font-semibold text-black block w-6/12">
-                {{ getDataComputed.sys.sunset }}
+                {{ getDataOneCallComputed.sys.sunset }}
               </span>
             </div> -->
 
@@ -116,8 +116,8 @@
               </h2>
 
               <div class="card p-2 rounded-2xl bg-secondary1">
-                <p class="text-sm text-left">{{ windDirection }}, {{ getDataComputed.wind.speed.toFixed(1) }} м/с</p>
-                <p class="text-sm text-left mt-1" v-if="getDataComputed.wind.gust">c порывами, до {{ getDataComputed.wind.gust.toFixed(1) }} м/с</p>
+                <p class="text-sm text-left">{{ windTextualDescription(getDataOneCallComputed?.current.wind_deg) }}, {{ getDataOneCallComputed?.current.wind_speed.toFixed(1) }} м/с</p>
+                <p class="text-sm text-left mt-1" v-if="getDataOneCallComputed?.daily[0].wind_gust">c порывами, до {{ getDataOneCallComputed?.daily[0].wind_gust.toFixed(1) }} м/с</p>
               </div>
             </div>
 
@@ -128,10 +128,11 @@
               </h2>
 
               <div class="card p-2 rounded-2xl bg-secondary1">
-                <!-- <p class="text-sm text-left">Восход - {{ getLocalDate(getDataComputed.sys.sunrise) }}</p> -->
-                <p class="text-sm text-left">Восход - <b>{{ getLocalSunriseSunset(getDataComputed.sys.sunrise, getDataComputed.timezone) }}</b></p>
+                <!-- <p class="text-sm text-left">Восход - {{ getLocalDate(getDataOneCallComputed.sys.sunrise) }}</p> -->
 
-                <p class="text-sm text-left mt-1">Закат - <b>{{ getLocalSunriseSunset(getDataComputed.sys.sunset, getDataComputed.timezone) }}</b></p>
+                <p class="text-sm text-left">Восход - <b>{{ sunriseComp }}</b></p>
+
+                <p class="text-sm text-left mt-1">Закат - <b>{{ sunsetComp }}</b></p>
 
                 <p class="text-sm text-left mt-1">Продолжительность дня - <b>{{ durationOfDay }}</b></p>
               </div>
@@ -172,43 +173,68 @@ import { HPA_TO_MM_OF_MERCURY } from '~/config/config.js';
 import DuringDayCard from '~/components/DuringDayCard.vue';
 
 // todo получаем инфу по странам
-import { getCountryByCode } from '~/data/data.js';
+// import { getCountryByCode } from '~/data/data.js';
 
 import { useWeather } from '~/composables/useWeather.js';
 import { useDate } from '~/composables/useDate.js';
 import { useWind } from '~/composables/useWind.js';
 
 // todo используем composable с получением данных
-const { data, loading, getDataComputed, getDataOneCallComputed } = useWeather();
-console.log('data: ', data);
-console.log('getDataOneCallComputed: ', getDataOneCallComputed);
+const { loading, error, gotGeoData, locationData, coords, getDataOneCallComputed } = useWeather();
+
+console.log('gotGeoData: ', gotGeoData);
+console.log('coords: ', coords);
+// console.log('data: ', data);
+// console.log('getDataOneCallComputed: ', getDataOneCallComputed);
 
 // todo используем composable для получения даты
-const { compShortDateTime, getLocalDate, getLocalSunriseSunset } = useDate(getDataComputed);
-console.log('getLocalDate: ', getLocalDate);
+const { compShortDateTime, getLocalSunriseSunset } = useDate(getDataOneCallComputed);
+// console.log('getLocalDate: ', getLocalDate);
 
 // todo используем composable для получения даты
-const { windDirection, windTextualDescription } = useWind(getDataComputed);
-console.log('windTextualDescription: ', windTextualDescription);
+const { windTextualDescription } = useWind(getDataOneCallComputed);
+// console.log('windTextualDescription: ', windTextualDescription);
 
 // todo считаем параметры дня
-  const durationOfDay = computed(() => {
-    if (!getDataComputed.value.sys) return;
+/* const durationOfDay = () => {
+  // if (!getDataOneCallComputed.value.sys) return;
 
-    const durationSec = getDataComputed.value.sys.sunset - getDataComputed.value.sys.sunrise;
+  const durationSec = getDataOneCallComputed?.current?.sunset - getDataOneCallComputed?.current?.sunrise;
 
-    const hours = Math.trunc(durationSec / 3600);
-    console.log('hours: ', hours);
-    const minutes = Math.floor((durationSec - hours * 3600) / 60);
-    console.log('minutes: ', minutes);
+  const hours = Math.trunc(durationSec / 3600);
+  // console.log('hours: ', hours);
+  const minutes = Math.floor((durationSec - hours * 3600) / 60);
+  // console.log('minutes: ', minutes);
 
-    return `${hours} ч. ${minutes} мин.`;
-  })
+  return `${hours} ч. ${minutes} мин.`;
+}; */
+
+const durationOfDay = computed(() => {
+  const durationSec = getDataOneCallComputed?.value?.current?.sunset - getDataOneCallComputed?.value?.current?.sunrise;
+
+  const hours = Math.trunc(durationSec / 3600);
+  // console.log('hours: ', hours);
+  const minutes = Math.floor((durationSec - hours * 3600) / 60);
+  // console.log('minutes: ', minutes);
+
+  return `${hours} ч. ${minutes} мин.`;
+})
+
+const sunriseComp = computed(() => {
+  return getLocalSunriseSunset(getDataOneCallComputed?.value?.current?.sunrise, getDataOneCallComputed?.value?.timezone_offset);
+})
+
+
+const sunsetComp = computed(() => {
+  return getLocalSunriseSunset(getDataOneCallComputed?.value?.current?.sunset, getDataOneCallComputed?.value?.timezone_offset);
+})
+
+
 
   // todo получаем имя страны
-const getCountryName = computed(() => {
-  return getCountryByCode(getDataComputed.value?.sys.country)
-})
+/* const getCountryName = computed(() => {
+  return getCountryByCode(getDataOneCallComputed.value?.sys.country)
+}) */
 
 </script>
 

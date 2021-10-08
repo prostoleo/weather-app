@@ -17,10 +17,10 @@
     }
   });
 
-  console.log('props: ', props);
+  // console.log('props: ', props);
 
   const locale = navigator.language;
-  console.log('locale: ', locale);
+  // console.log('locale: ', locale);
 
   const dayOfWeek = Intl.DateTimeFormat(locale, {
     weekday: 'short'

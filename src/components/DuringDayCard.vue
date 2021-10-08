@@ -88,8 +88,8 @@
   import { HPA_TO_MM_OF_MERCURY } from '~/config/config.js';
   import { getLocalSunriseSunset } from '~/helpers/helpers.js';
 
-  import { useDate } from '~/composables/useDate.js';
-  console.log('useDate: ', useDate);
+  // import { useDate } from '~/composables/useDate.js';
+  // console.log('useDate: ', useDate);
 
   const props = defineProps({
     data: {
@@ -104,7 +104,7 @@
     }
   });
 
-  console.log('props: ', props);
+  // console.log('props: ', props);
 
   //* получаем локальное время захода / рассвета
   const time = getLocalSunriseSunset(props.data?.dt, props.timezone);

@@ -147,7 +147,7 @@ import { getLocalSunriseSunset } from '~/helpers/helpers.js';
     }
   });
 
-  console.log('props - forecast card: ', props);
+  // console.log('props - forecast card: ', props);
 
   /* function showDate() {
     if (!props.data.dt) return;
@@ -160,10 +160,10 @@ import { getLocalSunriseSunset } from '~/helpers/helpers.js';
     const localTS = (time + timezone) * 1000;
 
     const date = new Date(localTS);
-    console.log('date: ', date);
+    // console.log('date: ', date);
 
     const localOffset = date.getTimezoneOffset() * 60 * 1000;
-    console.log('localOffset: ', localOffset);
+    // console.log('localOffset: ', localOffset);
 
     const newTS = localTS + localOffset;
 
