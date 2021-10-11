@@ -11,6 +11,12 @@ declare module '*.md' {
   export default component
 }
 
+declare module '~/App.vue' {
+  import { App } from '~/App.vue';
+
+  export const App = App;
+}
+
 declare module '~/config/config.js' {
   import { WEATHER_URL, API_KEY, TIME, HPA_TO_MM_OF_MERCURY } from '~/config/config.js';
 
@@ -24,6 +30,12 @@ declare module '~/data/data.js' {
   import { getCountryByCode } from '~/data/data.js';
 
   export const getCountryByCode = getCountryByCode;
+}
+
+declare module '~/stores/weather.js' {
+  import { useWeatherStore } from '~/stores/weather.js';
+
+  export const useWeatherStore = useWeatherStore;
 }
 declare module '~/helpers/helpers.js' {
   import { getLocalSunriseSunset } from '~/helpers/helpers.js';

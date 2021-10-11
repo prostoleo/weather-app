@@ -4,6 +4,10 @@ import { WEATHER_URL, API_KEY, TIME, API_KEY_CODING, API_KEY_REVERSE_CODING, COD
 
 import { useWeatherStore } from '~/stores/weather.js';
 
+// todo работа с pinia store
+const store = useWeatherStore();
+console.log('store: ', store);
+
 export function useWeather(query = null) {
   //* для основных данных
   const data = ref(null);
@@ -15,10 +19,10 @@ export function useWeather(query = null) {
   const loading = ref(false);
 
   //* для координат
-  const coords = reactive({
+  /* const coords = reactive({
     lat: null,
     lon: null,
-  });
+  }); */
 
   const gotGeoData = ref(false);
 
@@ -32,14 +36,10 @@ export function useWeather(query = null) {
     message: 'Упс, что-то пошло не так'
   });
 
-  // todo работа с pinia store
-  const store = useWeatherStore();
-  console.log('store: ', store);
-  
   let timer = null;
 
   // todo получаем основную информацию о погоде
-  async function getWeatherData(coords = null) {
+  async function getWeatherData() {
     loading.value = true;
 
     const dataFromStore = store.getWeatherNow;
@@ -54,38 +54,18 @@ export function useWeather(query = null) {
 
     try {
       loading.value = true;
-     
-      const geoData = window.navigator.geolocation.getCurrentPosition(
-        async (dataGeo) => {
-          loading.value = true;
-          console.log('dataGeo: ', dataGeo);
-          coords.lat = dataGeo.coords.latitude;
-          coords.lon = dataGeo.coords.longitude;
-    
-          console.log('coords: ', coords);
-          
-          gotGeoData.value = true;
-          store.addCoords(coords);
-    
-          
-          await getReverseGeocoding(coords);
-          await getOneCallData(coords);
-          loading.value = false;
-        },
-        async () => {
-          console.log('не удалось получить данные о местоположении');
-          
-          loading.value = true;
-          // await getGeocoding();
-          // await getOneCallData();
-          loading.value = false;
-        }
-      );
 
-      timer = setTimeout(() => {
+      const optionsGeoData = {
+        enableHighAccuracy: true,
+        timeout: TIME * 1000,
+      }
+     
+      const geoData = navigator.geolocation.getCurrentPosition(successGetGeoData, failGetGeoData, optionsGeoData);
+
+      /* timer = setTimeout(() => {
         error.status = true;
         throw new Error ('Упс, запрос занял слишком много времени');
-      }, TIME * 1000);
+      }, TIME * 1000); */
 
       
     } catch (error) {
@@ -96,6 +76,33 @@ export function useWeather(query = null) {
       clearTimeout(timer);
     }
   };
+
+  // todo удалось получить геоданные
+  async function successGetGeoData(pos) {
+    loading.value = true;
+    console.log('pos: ', pos);
+    const cds = pos.coords;
+    console.log('cds: ', cds);
+
+    /* coords.lat = cds.latitude;
+    coords.lon = cds.longitude; */
+
+    gotGeoData.value = true;
+    store.addCoords(cds);
+    
+    await getReverseGeocoding();
+    await getOneCallData();
+    loading.value = false;
+  }
+
+  async function failGetGeoData() {
+    console.log('не удалось получить данные о местоположении');
+          
+    loading.value = true;
+    // await getGeocoding();
+    // await getOneCallData();
+    loading.value = false;
+  }
 
   async function getGeocoding(query) {
     console.log('query: ', query);
@@ -125,18 +132,20 @@ export function useWeather(query = null) {
     // data.value = result;
     //* сохраняем необходимые данные
 
-    coords.lat = result[0].lat;
-    coords.lon = result[0].lon;
+    /* coords.lat = result[0].lat;
+    coords.lon = result[0].lon; */
     locationData.display_name = result[0].display_name;
     locationData.icon = result[0].icon;
 
     return {
-      coords,
+      // coords,
       locationData
     }
   }
 
-  async function getReverseGeocoding(coords) {
+  async function getReverseGeocoding() {
+    const coords = store.getCoords;
+
     loading.value = true;
 
     console.log('coords - reverseGeoCoding: ', coords);
@@ -145,7 +154,7 @@ export function useWeather(query = null) {
       throw new Error(' не удалось получить координаты  ');
     }
     // const request = `${WEATHER_URL}?q=Челябинск&units=metric&appid=${API_KEY}&lang=ru`;
-    const request = `${CODING_REVERSE_URL}?key=${API_KEY_REVERSE_CODING}&lat=${coords.lat}&lon=${coords.lon}&format=json`
+    const request = `${CODING_REVERSE_URL}?key=${API_KEY_REVERSE_CODING}&lat=${coords.latitude}&lon=${coords.longitude}&format=json`
 
     const response = await fetch(request, {
       headers: {
@@ -168,19 +177,24 @@ export function useWeather(query = null) {
   }
 
   // todo для oneCall API
-  async function getOneCallData(cds) {
-    console.log('coords in getOneCallData(): ', coords);
+  async function getOneCallData() {
+    const coords = store.getCoords;
+    // console.log('coords in getOneCallData(): ', cds);
 
     const exclude = 'minutely,alerts';
 
-    const coordsToApi = cds ?? {
-      lat: coords?.lat, 
-      lon: coords?.lon, 
+    /* const coordsToApi = cds ?? {
+      lat: coords.lat, 
+      lon: coords.lon, 
     }
+    console.log('coordsToApi: ', coordsToApi); */
+    // console.log('coordsToApi: ', coordsToApi);
+    // const requestOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${coordsToApi.lat}&lon=${coordsToApi.lon}&units=metric&&exclude=${exclude}&appid=${API_KEY}&lang=ru`;
 
-    console.log('coordsToApi: ', coordsToApi);
+    /* console.log('coords.lat: ', coords.lat);
+    console.log('coords.lon: ', coords.lon); */
 
-    const requestOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${coordsToApi.lat}&lon=${coordsToApi.lon}&units=metric&&exclude=${exclude}&appid=${API_KEY}&lang=ru`;
+    const requestOneCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${coords.latitude}&lon=${coords.longitude}&units=metric&&exclude=${exclude}&appid=${API_KEY}&lang=ru`;
 
     const responseOneCall = await fetch(requestOneCall);
     console.log('responseOneCall: ', responseOneCall);
@@ -215,9 +229,9 @@ export function useWeather(query = null) {
     }
   );
 
-  watch(getOneCallData, () => {
+  /* watch(getOneCallData, () => {
 
-  });
+  }); */
 
   // const getDataComputed = computed(() => data.value);
 
@@ -237,7 +251,7 @@ export function useWeather(query = null) {
     getOneCallData,
 
     error,
-    coords,
+    // coords,
     getWeatherData,
     // getDataComputed,
     getDataOneCallComputed

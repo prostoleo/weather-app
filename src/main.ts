@@ -2,7 +2,7 @@
 import { ViteSSG } from 'vite-ssg'
 import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:generated-layouts'
-import App from './App.vue'
+import App from './App.vue';
 
 // windicss layers
 import 'virtual:windi-base.css'
@@ -14,8 +14,9 @@ import './styles/main.scss'
 import 'virtual:windi-utilities.css'
 // windicss devtools support (dev only)
 import 'virtual:windi-devtools'
+// import { createPinia } from 'pinia'
 
-const routes = setupLayouts(generatedRoutes)
+const routes = setupLayouts(generatedRoutes);
 
 // https://github.com/antfu/vite-ssg
 export const createApp = ViteSSG(
@@ -24,5 +25,6 @@ export const createApp = ViteSSG(
   (ctx) => {
     // install all modules under `modules/`
     Object.values(import.meta.globEager('./modules/*.ts')).map(i => i.install?.(ctx))
+
   },
 )

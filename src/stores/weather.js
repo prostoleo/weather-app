@@ -1,42 +1,47 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
-import { unref, isRef } from "@vue/reactivity";
+import { unref, isRef } from '@vue/reactivity';
 
 export const useWeatherStore = defineStore('weather', {
   state: () => {
     weather: null
     query: ''
     coords: null
-
   },
   getters: {
     getWeatherNow(state) {
-      return state?.data;
+      console.log('state: ', state);
+      return state?.weather;
     },
 
     getCoords(state) {
-      return state?.coords;
+      return state.coords;
+    },
+
+    getQuery(state) {
+      return state.query;
     }
   },
 
   actions: {
-    addWeatherNow(data) {
-      console.log('data: ', data);
-      console.log('isRef: ', isRef(data));
-      // console.log('data.value: ', data.value);
-      console.log('data._value._target: ', data?._value?._target);
-      // console.log('data: ', data);
-      console.log('unref(data): ', unref(data));
-      this.weather = unref(data);
+    addWeatherNow(weather) {
+      console.log('weather - addWeatherNow action: ', weather);
+      // this.weather = unref(weather);
+      this.weather = weather;
     },
 
-    addCoords(data) {
-      console.log('data: ', data);
+    addCoords(coords) {
+      console.log('coords in addCoords: ', coords);
 
-      if (!data) return;
+      if (!coords) return;
 
-      this.coords = data;
+      this.coords = coords;
       console.log('this.coords: ', this.coords);
+    },
+
+    addQuery(query) {
+      console.log('query in action: ', query);
+      this.query = query;
     }
   }
 })

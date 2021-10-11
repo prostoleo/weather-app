@@ -108,7 +108,11 @@ import { HPA_TO_MM_OF_MERCURY } from '~/config/config.js';
 // todo получаем инфу по странам
 // import { getCountryByCode } from '~/data/data.js';
 
-// import { useWeatherStore } from '~/stores/weather.js'
+import { useWeatherStore } from '~/stores/weather.js';
+
+//* переменная для storage pinia
+const store = useWeatherStore();
+
 const forecasts = ref(null);
 
 /* console.log('WEATHER_URL: ', WEATHER_URL);
@@ -118,8 +122,7 @@ console.log('TIME: ', TIME); */
 // todo используем composable с получением данных
 const { dataOneCall, loading, error, gotGeoData, locationData, coords, getDataOneCallComputed, getGeocoding, getOneCallData } = useWeather();
 
-
-console.log('coords: ', coords);
+// console.log('coords: ', coords);
 
 /* console.log('dataOneCall: ', dataOneCall);
 console.log('data: ', data);
@@ -131,12 +134,12 @@ forecasts.value = getDataOneCallComputed?.daily;
 //=====================================
 // todo используем composable для получения даты
 const { compShortDateTime } = useDate(getDataOneCallComputed);
-console.log('compShortDateTime: ', compShortDateTime);
+// console.log('compShortDateTime: ', compShortDateTime);
 // console.log('getLocalDate: ', getLocalDate);
 
 // todo используем composable для получения даты
 const { windDirection, windTextualDescription } = useWind(getDataOneCallComputed);
-console.log('windDirection: ', windDirection);
+// console.log('windDirection: ', windDirection);
 // console.log('windTextualDescription: ', windTextualDescription);
 
 async function showWeatherOnSearch(searchQuery: string) {
@@ -145,7 +148,12 @@ async function showWeatherOnSearch(searchQuery: string) {
   const { coords } = await getGeocoding(searchQuery); 
   console.log('coords: ', coords);
 
-  await getOneCallData(coords);
+  //* добавляем поисковый запрос в store
+  store.addQuery(searchQuery);
+  //* добавляем координаты в store
+  store.addCoords(coords);
+
+  await getOneCallData();
   console.log('dataOneCall: ', dataOneCall);
 
 }

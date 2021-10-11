@@ -182,8 +182,9 @@ import { useWind } from '~/composables/useWind.js';
 // todo используем composable с получением данных
 const { loading, error, gotGeoData, locationData, coords, getDataOneCallComputed } = useWeather();
 
-console.log('gotGeoData: ', gotGeoData);
-console.log('coords: ', coords);
+// console.log('getDataOneCallComputed: ', getDataOneCallComputed);
+// console.log('gotGeoData: ', gotGeoData);
+// console.log('coords: ', coords);
 // console.log('data: ', data);
 // console.log('getDataOneCallComputed: ', getDataOneCallComputed);
 
