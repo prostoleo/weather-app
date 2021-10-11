@@ -1,13 +1,21 @@
-import { defineStore } from 'pinia';
+import { defineStore, createPinia } from 'pinia';
 
 import { unref, isRef } from '@vue/reactivity';
 
+// todo для того чтобы использовать pinia вне setup нужно - https://pinia.esm.dev/ssr/#using-the-store-outside-of-setup
+
+import App from '~/App.vue';
+
+const pinia = createPinia();
+const app = createApp(App);
+app.use(pinia);
+
 export const useWeatherStore = defineStore('weather', {
-  state: () => {
-    weather: null
-    query: ''
+  state: () => ({
+    weather: null,
+    query: '',
     coords: null
-  },
+  }),
   getters: {
     getWeatherNow(state) {
       console.log('state: ', state);
